@@ -30,7 +30,7 @@ describe("Cinema tests", () => {
 
   test("Ticket for Movie if seat is taken already", async () => {
     let row = 7;
-    let seat = 7;
+    let seat = 5;
     await expect(async () => {
       await selectDateTime(page, tomorrow, movieTime);
       await orderTickets(page, row, seat);
