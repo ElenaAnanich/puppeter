@@ -17,22 +17,37 @@ After(async function () {
   }
 });
 
-Given("the user is on the home page", async () => {
-  page = await browser.newPage();
-  await page.goto("http://qamid.tmweb.ru/client/index.php");
+Given("user is on {string}", async function (string) {
+  return await this.page.goto(`${string}`);
 });
 
-When("the user selects a movie", async () => {
-  await page.click(
-    "body > nav > a.page-nav__day.page-nav__day_chosen > span.page-nav__day-week"
-  );
-  await page.waitForSelector("span");
-  await page.click(
-    "body > main > section:nth-child(1) > div.movie-seances__hall > ul"
-  );
-  await page.waitForSelector("li");
+When("user select {int} day", async function (int) {
+  this.page.waitForSelector('[class="page-nav__day-week"]');
+  await (await this.page.$$('[class="page-nav__day-week"]'))[int].click();
 });
 
-Then("the user sees the movie session starting at 10:00", async () => {
-  const expected = "Начало сеанса: 10:00";
+When("user take a ticket {int} row {int} sit", async function (int, int4) {
+  console.log(int4);
+  this.page.waitForSelector('[class="movie-seances__time-block"]');
+  await this.page.click('[class="movie-seances__time-block"]');
+
+  this.page.waitForSelector(`div > div:nth-child(${int}) > span`);
+  await this.page.click(`div:nth-child(${int}) > span:nth-child(${int4})`);
+
+  this.page.waitForSelector('[class="acceptin-button"]');
+  this.page.click('[class="acceptin-button"]');
+
+  this.page.waitForSelector('[class="ticket__check-title"]');
+  this.page.waitForSelector('[class="acceptin-button"]');
+  this.page.click('[class="acceptin-button"]');
+});
+
+Then("user seen {string}", async function (string) {
+  console.log(string);
+  await this.page.waitForSelector('[class="ticket__check-title"]');
+  const title = await this.page.$eval(
+    '[class="ticket__check-title"]',
+    (link) => link.textContent
+  );
+  expect(title).contain("Вы выбрали билеты:");
 });
